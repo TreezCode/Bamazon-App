@@ -21,7 +21,7 @@ INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Wise Cam 1080p HD Home Camera", "Electronics", 25.99, 50);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("Roku Streaming Stick+|HD/4K", "Electronics", 49.00, 50);
+VALUES ("Roku Streaming Stick+|HD/4K", "Electronics", 49.99, 50);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Logitech MK270 Keyboard & Mouse", "Electronics", 19.99, 100);
@@ -30,7 +30,7 @@ INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Echo (2nd Gen) Smart Speaker w/ Balexa", "Electronics", 99.99, 75);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("Oculus Rift S VR Headset", "Electronics", 399.00, 10);
+VALUES ("Oculus Rift S VR Headset", "Electronics", 399.99, 10);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Honeywell HT-900 Turboforce Fan", "Home & Kitchen", 12.99, 75);
