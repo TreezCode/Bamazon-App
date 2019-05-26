@@ -7,7 +7,7 @@ const colors = require("colors");
 
 // Global Variables
 let asterisk = "*****************************************************".rainbow;
-let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~".rainbow;
 
 // Store connection with MySQL
 const connection = mysql.createConnection({
@@ -58,7 +58,7 @@ function displayItems () {
                     {hAlign: "center", content: colors.white(res[i].item_id)}, 
                     {hAlign: "left", content: colors.cyan(res[i].product_name)}, 
                     {hAlign: "center", content: colors.yellow(res[i].department_name)}, 
-                    {hAlign: "center", content: colors.green(res[i].price)}, 
+                    {hAlign: "center", content: colors.green("$" + res[i].price)}, 
                     {hAlign: "center", content: colors.magenta(res[i].stock_quantity)}
                 ]
             );
@@ -68,7 +68,7 @@ function displayItems () {
     });
 }
 
-// Prompt user
+// Prompt user for purchase details
 function promptBuyer() {
     inquirer.prompt([
         {
@@ -90,6 +90,7 @@ function promptBuyer() {
         let item = answers.productId;
         let quantity = answers.quantity;
 
+        // Pass purchase details response thru purchaseItem
         purchaseItem(item, quantity);
     });
 }
@@ -102,7 +103,7 @@ function purchaseItem(purId, purQuantity) {
             let purCost = res[0].price * purQuantity;
             console.log(
                 "\n" + tilde + "\n" +
-                "\n" + "Your total cost for", purQuantity, res[0].product_name, "is", purCost, "!" + "\n" +
+                "\n" + "Your total cost for", colors.magenta(purQuantity), colors.cyan(res[0].product_name), "is", "$".white + colors.white(purCost) + "!".white + "\n" +
                 "\n" + tilde + "\n"                
                 );
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
@@ -118,6 +119,7 @@ function purchaseItem(purId, purQuantity) {
     });
 }
 
+// Reprompt user after purchase to determine if they would like to continue shopping
 function repromptBuyer() {
     
 }
