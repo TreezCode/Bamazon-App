@@ -22,19 +22,12 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    displayItems();
+    displayProducts();
 });
 
 // Display all items currently for sale
-function displayItems () {
-    
-    // Log intro banner
-    console.log(
-        asterisk + "\n" + "\n" +
-        "     $ $ $   Bamazon | Online Shopping   $ $ $\n".white + "\n" +
-        asterisk
-    );
-    
+function displayProducts () {
+        
     // Select all products from db
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
@@ -63,7 +56,8 @@ function displayItems () {
                 ]
             );
         }
-        console.log(table.toString());
+        console.log("\n\n                         $ $ $ $ ".green + " Bamazon | Online Shopping ".white +  " $ $ $ $\n".green);
+        console.log(table.toString() + "\n");
         promptBuyer();
     });
 }
@@ -73,13 +67,13 @@ function promptBuyer() {
     inquirer.prompt([
         {
             type: "input",
-            message: "What is the product ID you are interested in?",
+            message: "What is the product ID you are interested in?".white,
             name: "productId",
             filter: Number
         },
         {
             type: "input",
-            message: "How many units of the product would you like to buy?",
+            message: "How many units of the product would you like to buy?".white,
             name: "quantity" ,
             filter: Number
         }
@@ -107,19 +101,44 @@ function purchaseItem(purId, purQuantity) {
                 "\n" + tilde + "\n"                
                 );
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
-            displayItems();         
+            displayProducts();         
         } else {
             console.log(
                 "\n" + tilde + "\n" +
                 "\n" + "Sorry it looks like we have insufficient stock for that order! >.<" + "\n" +
                 "\n" + tilde + "\n"
             );
-            purchaseItem();
+            displayProducts();         
         }
     });
 }
 
 // Reprompt user after purchase to determine if they would like to continue shopping
 function repromptBuyer() {
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the product ID you are interested in?".white,
+            name: "productId",
+            filter: Number
+        },
+        {
+            type: "input",
+            message: "How many units of the product would you like to buy?".white,
+            name: "quantity" ,
+            filter: Number
+        }
+    ])
+    .then(answers => {
+
+        // Store user input as a purchase order
+        let item = answers.productId;
+        let quantity = answers.quantity;
+
+        // Pass purchase details response thru purchaseItem
+        purchaseItem(item, quantity);
+    });
     
 }
+
