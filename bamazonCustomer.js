@@ -21,7 +21,6 @@ const connection = mysql.createConnection({
 // Initialize connection
 connection.connect(function(err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
     displayProducts();
 });
 
@@ -41,7 +40,7 @@ function displayProducts () {
                 {hAlign: "center", content: "Price:".grey}, 
                 {hAlign: "center", content: "Stock".grey}
             ],
-            colWidths: [10, 40, 20, 10, 10],
+            colWidths: [10, 40, 20, 12, 10],
         })
 
         // Iterate through response and push each item to the table with style     
@@ -67,13 +66,13 @@ function promptBuyer() {
     inquirer.prompt([
         {
             type: "input",
-            message: "What is the product ID you are interested in?".white,
+            message: "What is the product ID you are interested in?\n".white,
             name: "productId",
             filter: Number
         },
         {
             type: "input",
-            message: "How many units of the product would you like to buy?".white,
+            message: "How many units of the product would you like to buy?\n".white,
             name: "quantity" ,
             filter: Number
         }
@@ -93,22 +92,45 @@ function promptBuyer() {
 function purchaseItem(purId, purQuantity) {
     connection.query("SELECT * FROM products WHERE item_id = " + purId, function(err, res) {
         if (err) throw err;
-        if(purQuantity <= res[0].stock_quantity) {
-            let purCost = res[0].price * purQuantity;
-            console.log(
-                "\n" + tilde + "\n" +
-                "\n" + "Your total cost for", colors.magenta(purQuantity), colors.cyan(res[0].product_name), "is", "$".white + colors.white(purCost) + "!".white + "\n" +
-                "\n" + tilde + "\n"                
-                );
+
+        let item = res[0];                
+        if(purQuantity <= item.stock_quantity) {
+
+            // Calculate and store total cost of purchase
+            let purCost = item.price * purQuantity;
+
+            // Create and style table constructor for "cli-table3"
+            let table = new Table({
+                head: [
+                    {hAlign: "center", content: "Id:".grey},
+                    {hAlign: "center", content: "Item:".grey}, 
+                    {hAlign: "center", content: "Department:".grey}, 
+                    {hAlign: "center", content: "Quantity".grey},
+                    {hAlign: "center", content: "Total:".grey} 
+                ],
+                colWidths: [10, 40, 20, 10, 12],
+            })
+
+            table.push(
+                [
+                    {hAlign: "center", content: colors.white(item.item_id)}, 
+                    {hAlign: "left", content: colors.cyan(item.product_name)}, 
+                    {hAlign: "center", content: colors.yellow(item.department_name)}, 
+                    {hAlign: "center", content: colors.magenta(purQuantity)},
+                    {hAlign: "center", content: colors.green("$" + purCost)}, 
+                ]
+            );
+            console.log("\n\n                             $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
+            console.log(table.toString() + "\n");
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
-            displayProducts();         
+            repromptBuyer();        
         } else {
             console.log(
                 "\n" + tilde + "\n" +
                 "\n" + "Sorry it looks like we have insufficient stock for that order! >.<" + "\n" +
                 "\n" + tilde + "\n"
             );
-            displayProducts();         
+            repromptBuyer();
         }
     });
 }
@@ -118,26 +140,26 @@ function repromptBuyer() {
 
     inquirer.prompt([
         {
-            type: "input",
-            message: "What is the product ID you are interested in?".white,
-            name: "productId",
-            filter: Number
-        },
-        {
-            type: "input",
-            message: "How many units of the product would you like to buy?".white,
-            name: "quantity" ,
-            filter: Number
+            type: "list",
+            message: "Would you like to continue shopping?\n".white,
+            name: "reprompt",
+            choices: ["Yes", "No"]
         }
     ])
     .then(answers => {
 
-        // Store user input as a purchase order
-        let item = answers.productId;
-        let quantity = answers.quantity;
+        
+        if (answers.reprompt === "Yes") {
+            displayProducts();
+        } else {
+            console.log(
+                "\n" + tilde + "\n" +
+                "\n" + "Thanks for shopping with Bamazon! >.<" + "\n" +
+                "\n" + tilde + "\n"
+            );
+            connection.end();
+        }
 
-        // Pass purchase details response thru purchaseItem
-        purchaseItem(item, quantity);
     });
     
 }

@@ -24,7 +24,7 @@ function managerPrompt() {
     inquirer.prompt([
         {
             type: "list",
-            message: "Please choose one of the following options:".white,
+            message: "Please choose one of the following options:\n".white,
             name: "options",
             choices: [
                 "View Products for Sale", 
@@ -70,7 +70,7 @@ function displayProducts() {
                     {hAlign: "center", content: "Price:".grey}, 
                     {hAlign: "center", content: "Stock".grey}
                 ],
-                colWidths: [10, 40, 20, 10, 10],
+                colWidths: [10, 40, 20, 12, 10],
             })
     
             // Iterate through response and push each item to the table with style     
