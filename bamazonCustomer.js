@@ -6,7 +6,6 @@ const inquirer = require("inquirer");
 const colors = require("colors");
 
 // Global Variables
-let asterisk = "*****************************************************".rainbow;
 let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~".rainbow;
 
 // Store connection with MySQL
@@ -67,23 +66,23 @@ function promptBuyer() {
         {
             type: "input",
             message: "What is the product ID you are interested in?\n".white,
-            name: "productId",
+            name: "prodId",
             filter: Number
         },
         {
             type: "input",
             message: "How many units of the product would you like to buy?\n".white,
-            name: "quantity" ,
+            name: "prodQuantity" ,
             filter: Number
         }
     ])
     .then(answers => {
 
-        // Store user input as a purchase order
-        let item = answers.productId;
-        let quantity = answers.quantity;
+        // Store user input as variables to pass as arguments
+        let item = answers.prodId;
+        let quantity = answers.prodQuantity;
 
-        // Pass purchase details response thru purchaseItem
+        // Pass purchase data thru purchaseItem
         purchaseItem(item, quantity);
     });
 }
@@ -99,7 +98,7 @@ function purchaseItem(purId, purQuantity) {
         if(purQuantity <= item.stock_quantity) {
 
             // Calculate and store total cost of purchase
-            let purCost = item.price * purQuantity;
+            let cost = item.price * purQuantity;
 
             // Create and style table constructor for "cli-table3"
             let table = new Table({
@@ -120,12 +119,13 @@ function purchaseItem(purId, purQuantity) {
                     {hAlign: "left", content: colors.cyan(item.product_name)}, 
                     {hAlign: "center", content: colors.yellow(item.department_name)}, 
                     {hAlign: "center", content: colors.magenta(purQuantity)},
-                    {hAlign: "center", content: colors.green("$" + purCost)}, 
+                    {hAlign: "center", content: colors.green("$" + cost)}, 
                 ]
             );
-            
             console.log("\n\n                             $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
             console.log(table.toString() + "\n");
+
+            // Update database with user input
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
             repromptBuyer();        
         } else {
@@ -153,7 +153,6 @@ function repromptBuyer() {
     ])
     .then(answers => {
 
-        
         if (answers.reprompt === "Yes") {
             displayProducts();
         } else {
