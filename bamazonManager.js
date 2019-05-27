@@ -6,7 +6,6 @@ const inquirer = require("inquirer");
 const colors = require("colors");
 
 // Global Variables
-let asterisk = "*****************************************************".rainbow;
 let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~".rainbow;
 
 // Store connection with MySQL
@@ -30,7 +29,9 @@ function managerPrompt() {
                 "View Products for Sale", 
                 "View Low Inventory", 
                 "Add to Inventory", 
-                "Add New Products"
+                "Add New Product",
+                "Remove Product",
+                "Quit"
             ]
         }
     ])
@@ -45,12 +46,18 @@ function managerPrompt() {
                     lowInventory();
                     break;
             case "Add to Inventory":
-                    addInventory();
+                    addPrompt();
                     break;
-            case "Add New Products":
-                    newProducts();
+            case "Add New Product":
+                    newPrompt();
                     break;
-        }
+            case "Remove Product":
+                    removePrompt();
+                    break;
+            case "Quit":
+                    connection.end();
+                    break;
+            }
     });
 }
 
@@ -88,7 +95,7 @@ function displayProducts() {
             // Log intro banner
             console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Current Inventory ".white +  " $ $ $ $\n".green);
             console.log(table.toString() + "\n");
-            connection.end();
+            managerPrompt();
         });
 }
 
@@ -127,18 +134,185 @@ function lowInventory() {
         }
         console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Low Inventory ".white +  " $ $ $ $\n".green);
         console.log(table.toString() + "\n");
-        connection.end();
+        managerPrompt();        
     });
 }
 
 // Display a prompt that will let manager "add more" of any item currently in the store
-function addInventory() {
+function addPrompt() {
 
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "Please enter the Item ID that you would like to restock.\n".white,
+            name: "prodId",
+            filter: Number  
+        },
+        {
+            type: "input",
+            message: "How many units would you like to add?\n".white,
+            name: "prodQuantity",
+            filter: Number  
+        }
+    ])
+    .then(answers => {
+
+        // Store user input as variables to pass as arguments
+        let item = answers.prodId;
+        let quantity = answers.prodQuantity;
+
+        // Pass inventory restock data thru addInventory
+        addInventory(item, quantity);
+    });
+}
+
+function addInventory(addId, addQuantity) {
+
+    connection.query("SELECT * FROM products WHERE item_id = " + addId, function(err, res) {
+        if (err) throw err;
+
+        // Calculate and store total cost of restock
+        let item = res[0];
+        let cost = item.price * addQuantity;
+        
+        // Create and style table constructor for "cli-table3"
+        let table = new Table({
+            head: [
+                {hAlign: "center", content: "Id:".grey},
+                {hAlign: "center", content: "Item:".grey}, 
+                {hAlign: "center", content: "Department:".grey}, 
+                {hAlign: "center", content: "Quantity".grey},
+                {hAlign: "center", content: "Bill:".grey} 
+            ],
+            colWidths: [10, 40, 20, 10, 12],
+        })
+
+        // Push add inventory data to table to display as bill
+        table.push(
+            [
+                {hAlign: "center", content: colors.white(item.item_id)}, 
+                {hAlign: "left", content: colors.cyan(item.product_name)}, 
+                {hAlign: "center", content: colors.yellow(item.department_name)}, 
+                {hAlign: "center", content: colors.magenta(addQuantity)},
+                {hAlign: "center", content: colors.green("$" + cost )}
+            ]
+        );
+        console.log("\n\n                             $ $ $ $ ".green + " Bamazon Manager | Billing ".white +  " $ $ $ $\n".green);
+        console.log(table.toString() + "\n");
+
+        // Update database with user input
+        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + addQuantity + " WHERE item_id = " + addId);
+        managerPrompt();
+    })
 }
 
 // Allow manager to add a completely new product to the store
-function newProducts() {
+function newPrompt() {
+    
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "Please enter the name of the new product you would like to add.\n".white,
+            name: "name",  
+        },
+        {
+            type: "input",
+            message: "Please enter the department where the new products should be found.\n".white,
+            name: "department",
+        },
+        {
+            type: "input",
+            message: "Please enter the price of the new product.\n".white,
+            name: "price",
+            filter: Number  
+        },
+        {
+            type: "input",
+            message: "How many units would you like to add?\n".white,
+            name: "quantity",
+            filter: Number  
+        }
+    ])
+    .then(answers => {
 
+        // Store user input as variables to pass as arguments
+        let newName = answers.name;
+        let newDep = answers.department;
+        let newPrice = answers.price;
+        let newQuantity = answers.quantity;
+
+        // Pass inventory restock data thru newProduct
+        newProduct(newName, newDep, newPrice, newQuantity);
+    });
+}
+
+function newProduct(name, dep, price, quantity) {
+    connection.query("INSERT INTO products SET ?" + name, dep, price, quantity, function(err, res) {
+        if (err) throw err;
+
+        // Calculate and store total cost of restock
+        let item = res[0];
+        let cost = item.price * addQuantity;
+        
+        // Create and style table constructor for "cli-table3"
+        let table = new Table({
+            head: [
+                {hAlign: "center", content: "Id:".grey},
+                {hAlign: "center", content: "Item:".grey}, 
+                {hAlign: "center", content: "Department:".grey}, 
+                {hAlign: "center", content: "Quantity".grey},
+                {hAlign: "center", content: "Bill:".grey} 
+            ],
+            colWidths: [10, 40, 20, 10, 12],
+        })
+
+        // Push add inventory data to table to display as bill
+        table.push(
+            [
+                {hAlign: "center", content: colors.white(item.item_id)}, 
+                {hAlign: "left", content: colors.cyan(item.product_name)}, 
+                {hAlign: "center", content: colors.yellow(item.department_name)}, 
+                {hAlign: "center", content: colors.magenta(addQuantity)},
+                {hAlign: "center", content: colors.green("$" + cost )}
+            ]
+        );
+        console.log("\n\n                             $ $ $ $ ".green + " Bamazon Manager | Billing ".white +  " $ $ $ $\n".green);
+        console.log(table.toString() + "\n");
+
+        // Update database with user input
+        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + addQuantity + " WHERE item_id = " + addId);
+        managerPrompt();
+    })
+}
+
+// Display a prompt that will let manager "remove" any item currently in the store
+function removePrompt() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "Please enter the Item ID that you would like to remove.\n".white,
+            name: "prodId",
+            filter: Number  
+        }
+    ])
+    .then(answers => {
+        
+        // Store user input as variable to pass as argument
+        let item = answers.prodId;
+
+        // Pass inventory restock data thru addInventory
+        removeProduct(item);
+    });
+}
+
+function removeProduct(removeId) {
+    connection.query("DELETE * FROM products WHERE item_id = " + removeId, function(err, res) {
+        if (err) throw err;
+
+        let item = res[0];
+        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Product Removed ".white +  " $ $ $ $\n".green);
+        managerPrompt();
+    })
 }
 
 managerPrompt();
