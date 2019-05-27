@@ -87,7 +87,6 @@ function promptBuyer() {
     });
 }
 
-// Check database to confirm purchase availabilty
 function purchaseItem(purId, purQuantity) {
     connection.query("SELECT * FROM products WHERE item_id = " + purId, function(err, res) {
         if (err) throw err;
