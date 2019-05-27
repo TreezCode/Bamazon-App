@@ -93,7 +93,9 @@ function purchaseItem(purId, purQuantity) {
     connection.query("SELECT * FROM products WHERE item_id = " + purId, function(err, res) {
         if (err) throw err;
 
-        let item = res[0];                
+        let item = res[0]; 
+        
+        // Check if current inventory count is high enough to fill order
         if(purQuantity <= item.stock_quantity) {
 
             // Calculate and store total cost of purchase
@@ -111,6 +113,7 @@ function purchaseItem(purId, purQuantity) {
                 colWidths: [10, 40, 20, 10, 12],
             })
 
+            // Push purchase order data to table to display as recepit
             table.push(
                 [
                     {hAlign: "center", content: colors.white(item.item_id)}, 
@@ -120,11 +123,13 @@ function purchaseItem(purId, purQuantity) {
                     {hAlign: "center", content: colors.green("$" + purCost)}, 
                 ]
             );
+            
             console.log("\n\n                             $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
             console.log(table.toString() + "\n");
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
             repromptBuyer();        
         } else {
+
             console.log(
                 "\n" + tilde + "\n" +
                 "\n" + "Sorry it looks like we have insufficient stock for that order! >.<" + "\n" +
