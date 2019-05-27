@@ -7,7 +7,7 @@ const colors = require("colors");
 
 // Global Variables
 let asterisk = "*****************************************************".rainbow;
-let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~".rainbow;
 
 // Store connection with MySQL
 const connection = mysql.createConnection({
@@ -22,19 +22,12 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    displayItems();
+    displayProducts();
 });
 
 // Display all items currently for sale
-function displayItems () {
-    
-    // Log intro banner
-    console.log(
-        asterisk + "\n" + "\n" +
-        "     $ $ $   Bamazon | Online Shopping   $ $ $\n".white + "\n" +
-        asterisk
-    );
-    
+function displayProducts () {
+        
     // Select all products from db
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
@@ -58,28 +51,29 @@ function displayItems () {
                     {hAlign: "center", content: colors.white(res[i].item_id)}, 
                     {hAlign: "left", content: colors.cyan(res[i].product_name)}, 
                     {hAlign: "center", content: colors.yellow(res[i].department_name)}, 
-                    {hAlign: "center", content: colors.green(res[i].price)}, 
+                    {hAlign: "center", content: colors.green("$" + res[i].price)}, 
                     {hAlign: "center", content: colors.magenta(res[i].stock_quantity)}
                 ]
             );
         }
-        console.log(table.toString());
+        console.log("\n\n                         $ $ $ $ ".green + " Bamazon | Online Shopping ".white +  " $ $ $ $\n".green);
+        console.log(table.toString() + "\n");
         promptBuyer();
     });
 }
 
-// Prompt user
+// Prompt user for purchase details
 function promptBuyer() {
     inquirer.prompt([
         {
             type: "input",
-            message: "What is the product ID you are interested in?",
+            message: "What is the product ID you are interested in?".white,
             name: "productId",
             filter: Number
         },
         {
             type: "input",
-            message: "How many units of the product would you like to buy?",
+            message: "How many units of the product would you like to buy?".white,
             name: "quantity" ,
             filter: Number
         }
@@ -90,6 +84,7 @@ function promptBuyer() {
         let item = answers.productId;
         let quantity = answers.quantity;
 
+        // Pass purchase details response thru purchaseItem
         purchaseItem(item, quantity);
     });
 }
@@ -102,22 +97,48 @@ function purchaseItem(purId, purQuantity) {
             let purCost = res[0].price * purQuantity;
             console.log(
                 "\n" + tilde + "\n" +
-                "\n" + "Your total cost for", purQuantity, res[0].product_name, "is", purCost, "!" + "\n" +
+                "\n" + "Your total cost for", colors.magenta(purQuantity), colors.cyan(res[0].product_name), "is", "$".white + colors.white(purCost) + "!".white + "\n" +
                 "\n" + tilde + "\n"                
                 );
             connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
-            displayItems();         
+            displayProducts();         
         } else {
             console.log(
                 "\n" + tilde + "\n" +
                 "\n" + "Sorry it looks like we have insufficient stock for that order! >.<" + "\n" +
                 "\n" + tilde + "\n"
             );
-            purchaseItem();
+            displayProducts();         
         }
     });
 }
 
+// Reprompt user after purchase to determine if they would like to continue shopping
 function repromptBuyer() {
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the product ID you are interested in?".white,
+            name: "productId",
+            filter: Number
+        },
+        {
+            type: "input",
+            message: "How many units of the product would you like to buy?".white,
+            name: "quantity" ,
+            filter: Number
+        }
+    ])
+    .then(answers => {
+
+        // Store user input as a purchase order
+        let item = answers.productId;
+        let quantity = answers.quantity;
+
+        // Pass purchase details response thru purchaseItem
+        purchaseItem(item, quantity);
+    });
     
 }
+
