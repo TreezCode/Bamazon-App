@@ -5,9 +5,6 @@ const Table = require("cli-table3");
 const inquirer = require("inquirer");
 const colors = require("colors");
 
-// Global Variables
-let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~".rainbow;
-
 // Store connection with MySQL
 const connection = mysql.createConnection({
     host: "localhost",
@@ -93,7 +90,7 @@ function displayProducts() {
                 );
             }
             // Log intro banner
-            console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Current Inventory ".white +  " $ $ $ $\n".green);
+            console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Current Inventory ".white +  " $ $ $ $\n\n".green);
             console.log(table.toString() + "\n");
             managerPrompt();
         });
@@ -132,7 +129,7 @@ function lowInventory() {
                 );
             }
         }
-        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Low Inventory ".white +  " $ $ $ $\n".green);
+        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Low Inventory ".white +  " $ $ $ $\n\n".green);
         console.log(table.toString() + "\n");
         managerPrompt();        
     });
@@ -197,7 +194,7 @@ function addInventory(addId, addQuantity) {
                 {hAlign: "center", content: colors.green("$" + cost )}
             ]
         );
-        console.log("\n\n                             $ $ $ $ ".green + " Bamazon Manager | Billing ".white +  " $ $ $ $\n".green);
+        console.log("\n\n                             $ $ $ $ ".green + " Bamazon Manager | Billing ".white +  " $ $ $ $\n\n".green);
         console.log(table.toString() + "\n");
 
         // Update database with user input
@@ -217,7 +214,7 @@ function newPrompt() {
         },
         {
             type: "input",
-            message: "Please enter the department where the new products should be found.\n".white,
+            message: "Please enter the department where the new products will be found.\n".white,
             name: "department",
         },
         {
@@ -247,40 +244,15 @@ function newPrompt() {
 }
 
 function newProduct(name, dep, price, quantity) {
-    connection.query("INSERT INTO products SET ?" + name, dep, price, quantity, function(err, res) {
+    connection.query("INSERT INTO products SET ? ", {
+         product_name: name, 
+         department_name: dep, 
+         price: price, 
+         stock_quantity: quantity
+        }, function(err, res) {
         if (err) throw err;
-
-        // Calculate and store total cost of restock
-        let item = res[0];
-        let cost = item.price * addQuantity;
         
-        // Create and style table constructor for "cli-table3"
-        let table = new Table({
-            head: [
-                {hAlign: "center", content: "Id:".grey},
-                {hAlign: "center", content: "Item:".grey}, 
-                {hAlign: "center", content: "Department:".grey}, 
-                {hAlign: "center", content: "Quantity".grey},
-                {hAlign: "center", content: "Bill:".grey} 
-            ],
-            colWidths: [10, 40, 20, 10, 12],
-        })
-
-        // Push add inventory data to table to display as bill
-        table.push(
-            [
-                {hAlign: "center", content: colors.white(item.item_id)}, 
-                {hAlign: "left", content: colors.cyan(item.product_name)}, 
-                {hAlign: "center", content: colors.yellow(item.department_name)}, 
-                {hAlign: "center", content: colors.magenta(addQuantity)},
-                {hAlign: "center", content: colors.green("$" + cost )}
-            ]
-        );
-        console.log("\n\n                             $ $ $ $ ".green + " Bamazon Manager | Billing ".white +  " $ $ $ $\n".green);
-        console.log(table.toString() + "\n");
-
-        // Update database with user input
-        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + addQuantity + " WHERE item_id = " + addId);
+        console.log("\n\n                          $ $ $ $ ".green + " Bamazon Manager | New Product Added ".white +  " $ $ $ $\n\n".green);
         managerPrompt();
     })
 }
@@ -306,11 +278,11 @@ function removePrompt() {
 }
 
 function removeProduct(removeId) {
-    connection.query("DELETE * FROM products WHERE item_id = " + removeId, function(err, res) {
+    connection.query("DELETE FROM products WHERE item_id = " + removeId, function(err, res) {
         if (err) throw err;
 
         let item = res[0];
-        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Product Removed ".white +  " $ $ $ $\n".green);
+        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Product Removed ".white +  " $ $ $ $\n\n".green);
         managerPrompt();
     })
 }
