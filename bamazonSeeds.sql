@@ -14,7 +14,6 @@ CREATE TABLE products (
     PRIMARY KEY (item_id)
 );
 
-Select * From products;
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Fiya TV Cube w/ Balexa", "Electronics", 119.99, 25);
@@ -55,6 +54,16 @@ CREATE TABLE departments (
     PRIMARY KEY (department_id)
 );
 
-Select * From departments;
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("Electronics", 10000);
+
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("Home & Kitchen", 5000);
+
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("Movies & TV", 8000);
+
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("Office", 4000);
 
 ALTER TABLE products ADD COLUMN product_sales DECIMAL(10,2) NOT NULL;

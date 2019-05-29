@@ -90,7 +90,7 @@ function promptBuyer() {
 
 function purchaseItem(purId, purQuantity) {
 
-    let query = "SELECT * FROM products WHERE item_id = " + purId
+    let query = "SELECT * FROM products WHERE item_id = " + purId;
     connection.query(query, function(err, res) {
         if (err) throw err;
 
@@ -102,7 +102,7 @@ function purchaseItem(purId, purQuantity) {
             // Calculate and store total cost of purchase
             let cost = item.price * purQuantity;
 
-            // Calculate and store an updated product sales
+            // Calculate and store an updated product sales number
             let productSales = item.product_sales + cost
 
             // Create and style table constructor for "cli-table3"
