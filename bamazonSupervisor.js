@@ -14,12 +14,6 @@ const connection = mysql.createConnection({
     database: "bamazon"
 });
 
-// Initialize connection
-connection.connect(function(err) {
-    if (err) throw err;
-    supervisorPrompt();
-});
-
 // Prompt user for purchase details
 function supervisorPrompt() {
     inquirer.prompt([
@@ -43,7 +37,7 @@ function supervisorPrompt() {
                     viewProductSales();
                     break;
             case "Create New Department":
-                    promptDepartment();
+                    promptAdd();
                     break;
             case "Remove Department":
                     promptRemove();
@@ -57,44 +51,44 @@ function supervisorPrompt() {
 
 // Display a table of sales data with department_id, department_name, over_head_costs, product_sales, total_profit
 function viewProductSales() {
-    // Select all products from db
-    let query = "SELECT * FROM departments"
-    connection.query(query, function(err, res) {
-        if (err) throw err;
+    // // Select all products from db
+    // let query = "SELECT * FROM departments"
+    // connection.query(query, function(err, res) {
+    //     if (err) throw err;
         
-        // Create and style table constructor for "cli-table3"
-        let table = new Table({
-            head: [
-                {hAlign: "center", content: "Id:".grey},
-                {hAlign: "center", content: "Item:".grey}, 
-                {hAlign: "center", content: "Department:".grey}, 
-                {hAlign: "center", content: "Price:".grey}, 
-                {hAlign: "center", content: "Stock".grey}
-            ],
-            colWidths: [10, 40, 20, 12, 10],
-        });
+    //     // Create and style table constructor for "cli-table3"
+    //     let table = new Table({
+    //         head: [
+    //             {hAlign: "center", content: "Id:".grey},
+    //             {hAlign: "center", content: "Item:".grey}, 
+    //             {hAlign: "center", content: "Department:".grey}, 
+    //             {hAlign: "center", content: "Price:".grey}, 
+    //             {hAlign: "center", content: "Stock".grey}
+    //         ],
+    //         colWidths: [10, 40, 20, 12, 10],
+    //     });
 
-        // Iterate through response and push each item to the table with style     
-        for(let i = 0; i < res.length; i++) {
-            table.push(
-                [
-                    {hAlign: "center", content: colors.white(res[i].item_id)}, 
-                    {hAlign: "left", content: colors.cyan(res[i].product_name)}, 
-                    {hAlign: "center", content: colors.yellow(res[i].department_name)}, 
-                    {hAlign: "center", content: colors.green("$" + res[i].price)}, 
-                    {hAlign: "center", content: colors.magenta(res[i].stock_quantity)}
-                ]
-            );
-        }
-        // Log intro banner
-        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Current Inventory ".white +  " $ $ $ $\n\n".green);
-        console.log(table.toString() + "\n");
-        supervisorPrompt();
-    });
+    //     // Iterate through response and push each item to the table with style     
+    //     for(let i = 0; i < res.length; i++) {
+    //         table.push(
+    //             [
+    //                 {hAlign: "center", content: colors.white(res[i].item_id)}, 
+    //                 {hAlign: "left", content: colors.cyan(res[i].product_name)}, 
+    //                 {hAlign: "center", content: colors.yellow(res[i].department_name)}, 
+    //                 {hAlign: "center", content: colors.green("$" + res[i].price)}, 
+    //                 {hAlign: "center", content: colors.magenta(res[i].stock_quantity)}
+    //             ]
+    //         );
+    //     }
+    //     // Log intro banner
+    //     console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Current Inventory ".white +  " $ $ $ $\n\n".green);
+    //     console.log(table.toString() + "\n");
+    //     supervisorPrompt();
+    // });
 }
 
 // Allow supervisor to create a brand new department in the database
-function promptDepartment() {
+function promptAdd() {
 
     inquirer.prompt([
         {
@@ -165,3 +159,5 @@ function removeDepartment() {
         supervisorPrompt();
     });
 }
+
+supervisorPrompt();
