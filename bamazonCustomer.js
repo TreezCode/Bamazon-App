@@ -27,7 +27,8 @@ connection.connect(function(err) {
 function displayProducts () {
         
     // Select all products from db
-    connection.query("SELECT * FROM products", function(err, res) {
+    let query = "SELECT * FROM products"
+    connection.query(query, function(err, res) {
         if (err) throw err;
         
         // Create and style table constructor for "cli-table3"
@@ -88,7 +89,9 @@ function promptBuyer() {
 }
 
 function purchaseItem(purId, purQuantity) {
-    connection.query("SELECT * FROM products WHERE item_id = " + purId, function(err, res) {
+
+    let query = "SELECT * FROM products WHERE item_id = " + purId
+    connection.query(query, function(err, res) {
         if (err) throw err;
 
         let item = res[0]; 
@@ -98,6 +101,9 @@ function purchaseItem(purId, purQuantity) {
 
             // Calculate and store total cost of purchase
             let cost = item.price * purQuantity;
+
+            // Calculate and store an updated product sales
+            let productSales = item.product_sales + cost
 
             // Create and style table constructor for "cli-table3"
             let table = new Table({
@@ -121,11 +127,17 @@ function purchaseItem(purId, purQuantity) {
                     {hAlign: "center", content: colors.green("$" + cost)}, 
                 ]
             );
-            console.log("\n\n                             $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
+            console.log("\n\n                                $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
             console.log(table.toString() + "\n");
 
-            // Update database with user input
-            connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
+            // Update database stock quantity
+            let query1 = "UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId;
+            connection.query(query1);
+
+            // Update database product sales
+            let query2 = "UPDATE products SET product_sales = " + productSales + " WHERE item_id = " + purId;
+            connection.query(query2);
+
             repromptBuyer();        
         } else {
 
@@ -166,4 +178,3 @@ function repromptBuyer() {
     });
     
 }
-

@@ -5,14 +5,16 @@ CREATE DATABASE bamazon;
 USE bamazon;
 
 CREATE TABLE products (
-    item_id INT NOT NULL AUTO_INCREMENT,
+    item_id INT AUTO_INCREMENT NOT NULL ,
     product_name VARCHAR(100) NOT NULL,
-    department_name VARCHAR(100) NULL,
+    department_name VARCHAR(100) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     stock_quantity INT NOT NULL,
 
-    PRIMARY KEY(item_id),
+    PRIMARY KEY (item_id)
 );
+
+Select * From products;
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Fiya TV Cube w/ Balexa", "Electronics", 119.99, 25);
@@ -43,3 +45,16 @@ VALUES ("Game of Thrones: Season 8", "Movies & TV", 34.99, 50);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Mr. Robot: Season 1-3", "Movies & TV", 59.99, 25);
+
+
+CREATE TABLE departments (
+    department_id INT AUTO_INCREMENT NOT NULL,
+    department_name VARCHAR(100) NOT NULL,
+    over_head_costs DECIMAL(10,2) NOT NULL,
+
+    PRIMARY KEY (department_id)
+);
+
+Select * From departments;
+
+ALTER TABLE products ADD COLUMN product_sales DECIMAL(10,2) NOT NULL;

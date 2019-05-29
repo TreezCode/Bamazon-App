@@ -272,7 +272,7 @@ function removePrompt() {
         // Store user input as variable to pass as argument
         let item = answers.prodId;
 
-        // Pass inventory restock data thru addInventory
+        // Pass product data thru removeProduct
         removeProduct(item);
     });
 }
