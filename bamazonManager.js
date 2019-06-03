@@ -60,6 +60,7 @@ function managerPrompt() {
 
 // List every available item with ID, name, price and quantity
 function displayProducts() {
+    
         
     // Select all products from db
     let query = "SELECT * FROM products";
@@ -80,6 +81,7 @@ function displayProducts() {
 
         // Iterate through response and push each item to the table with style     
         for(let i = 0; i < res.length; i++) {
+
             table.push(
                 [
                     {hAlign: "center", content: colors.white(res[i].item_id)}, 
@@ -209,42 +211,56 @@ function addInventory(addId, addQuantity) {
 
 // Allow manager to add a completely new product to the store
 function newPrompt() {
-    
-    inquirer.prompt([
-        {
-            type: "input",
-            message: "Please enter the name of the new product you would like to add.\n".white,
-            name: "name",  
-        },
-        {
-            type: "input",
-            message: "Please enter the department where the new products will be found.\n".white,
-            name: "department",
-        },
-        {
-            type: "input",
-            message: "Please enter the price of the new product.\n".white,
-            name: "price",
-            filter: Number  
-        },
-        {
-            type: "input",
-            message: "How many units would you like to add?\n".white,
-            name: "quantity",
-            filter: Number  
+
+    // Store department names to display as choices
+    let depArr = [];
+
+    let query = "SELECT departments.department_name FROM bamazon.departments";
+
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        
+        for (let i = 0; i < res.length; i++) {
+            depArr.push(res[i].department_name);
         }
-    ])
-    .then(answers => {
 
-        // Store user input as variables to pass as arguments
-        let newName = answers.name;
-        let newDep = answers.department;
-        let newPrice = answers.price;
-        let newQuantity = answers.quantity;
-
-        // Pass inventory restock data thru newProduct
-        newProduct(newName, newDep, newPrice, newQuantity);
-    });
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "Please enter the name of the new product you would like to add.\n".white,
+                name: "name",  
+            },
+            {
+                type: "list",
+                message: "Please enter the department where the new products will be found.\n".white,
+                name: "department",
+                choices: depArr
+            },
+            {
+                type: "input",
+                message: "Please enter the price of the new product.\n".white,
+                name: "price",
+                filter: Number  
+            },
+            {
+                type: "input",
+                message: "How many units would you like to add?\n".white,
+                name: "quantity",
+                filter: Number  
+            }
+        ])
+        .then(answers => {
+    
+            // Store user input as variables to pass as arguments
+            let newName = answers.name;
+            let newDep = answers.department;
+            let newPrice = answers.price;
+            let newQuantity = answers.quantity;
+    
+            // Pass inventory restock data thru newProduct
+            newProduct(newName, newDep, newPrice, newQuantity);
+        });
+    })
 }
 
 function newProduct(name, dep, price, quantity) {
@@ -258,7 +274,7 @@ function newProduct(name, dep, price, quantity) {
         }, function(err, res) {
         if (err) throw err;
         
-        console.log("\n\n                          $ $ $ $ ".green + " Bamazon Manager | New Product Added ".white +  " $ $ $ $\n\n".green);
+        console.log("\n\n                     $ $ $ $ ".green + " Bamazon Manager | ".white + colors.yellow(name)+ " Added ".white +  " $ $ $ $\n\n".green);
         managerPrompt();
     });
 }

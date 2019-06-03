@@ -51,40 +51,51 @@ function supervisorPrompt() {
 
 // Display a table of sales data with department_id, department_name, over_head_costs, product_sales, total_profit
 function viewProductSales() {
-    // // Select all products from db
-    // let query = "SELECT * FROM departments"
-    // connection.query(query, function(err, res) {
-    //     if (err) throw err;
-        
-    //     // Create and style table constructor for "cli-table3"
-    //     let table = new Table({
-    //         head: [
-    //             {hAlign: "center", content: "Id:".grey},
-    //             {hAlign: "center", content: "Item:".grey}, 
-    //             {hAlign: "center", content: "Department:".grey}, 
-    //             {hAlign: "center", content: "Price:".grey}, 
-    //             {hAlign: "center", content: "Stock".grey}
-    //         ],
-    //         colWidths: [10, 40, 20, 12, 10],
-    //     });
 
-    //     // Iterate through response and push each item to the table with style     
-    //     for(let i = 0; i < res.length; i++) {
-    //         table.push(
-    //             [
-    //                 {hAlign: "center", content: colors.white(res[i].item_id)}, 
-    //                 {hAlign: "left", content: colors.cyan(res[i].product_name)}, 
-    //                 {hAlign: "center", content: colors.yellow(res[i].department_name)}, 
-    //                 {hAlign: "center", content: colors.green("$" + res[i].price)}, 
-    //                 {hAlign: "center", content: colors.magenta(res[i].stock_quantity)}
-    //             ]
-    //         );
-    //     }
-    //     // Log intro banner
-    //     console.log("\n\n                      $ $ $ $ ".green + " Bamazon Manager | Current Inventory ".white +  " $ $ $ $\n\n".green);
-    //     console.log(table.toString() + "\n");
-    //     supervisorPrompt();
-    // });
+    // Create alias for total sales and total profit then join the products and the departments tables
+    let query = `
+                SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
+                IFNULL(SUM(products.product_sales), 0) AS total_sales,
+                IFNULL(SUM(products.product_sales) - over_head_costs, over_head_costs * -1) AS total_profit
+                FROM bamazon.departments 
+                LEFT JOIN bamazon.products 
+                ON departments.department_name=products.department_name 
+                GROUP BY departments.department_id
+                `
+
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        
+        // Create and style table constructor for "cli-table3"
+        let table = new Table({
+            head: [
+                {hAlign: "center", content: "Id:".grey},
+                {hAlign: "center", content: "Department Name:".grey}, 
+                {hAlign: "center", content: "Overhead Costs:".grey}, 
+                {hAlign: "center", content: "Total Sales".grey},
+                {hAlign: "center", content: "Total Profit:".grey}            
+            ],
+            colWidths: [10, 30, 20, 20, 20],
+        });
+
+        // Iterate through response and push each item to the table with style     
+        for (let i = 0; i < res.length; i ++) {
+            
+            table.push(
+                [
+                    {hAlign: "center", content: colors.white(res[i].department_id)}, 
+                    {hAlign: "left", content: colors.yellow(res[i].department_name)}, 
+                    {hAlign: "center", content: colors.green(res[i].over_head_costs)}, 
+                    {hAlign: "center", content: colors.magenta(res[i].total_sales)},
+                    {hAlign: "center", content: colors.magenta(res[i].total_profit)}
+                ]
+            );
+        }
+        // Log intro banner
+        console.log("\n\n                      $ $ $ $ ".green + " Bamazon Supervisor | Department Sales ".white +  " $ $ $ $\n\n".green);
+        console.log(table.toString() + "\n");
+        supervisorPrompt();
+    });
 }
 
 // Allow supervisor to create a brand new department in the database
@@ -118,10 +129,13 @@ function addDepartment(name, cost) {
 
     // Update database
     let query = "INSERT INTO departments SET ? ";
-    connection.query(query, {department_name: name, over_head_costs: cost}, function(err, res) {
+
+    connection.query(query, [{
+        department_name: name,
+        over_head_costs: cost,
+    }], function(err, res) {
         if (err) throw err;
-    
-        console.log("\n\n                        $ $ $ $ ".green + " Bamazon Supervisor | New Department Added ".white +  " $ $ $ $\n\n".green);
+        console.log("\n\n                        $ $ $ $ ".green + " Bamazon Supervisor | ".white + colors.yellow(name) +" Department Added ".white +  " $ $ $ $\n\n".green);
         supervisorPrompt();
     });
 }
@@ -133,28 +147,27 @@ function promptRemove() {
         {
             type: "input",
             message: "Please enter the Department ID that you would like to remove.\n".white,
-            name: "depId",
+            name: "id",
             filter: Number  
         }
     ])
     .then(answers => {
         
         // Store user input as variable to pass as argument
-        let item = answers.prodId;
+        let depId = answers.id;
 
         // Pass product data thru removeProduct
-        removeDepartment(item);
+        removeDepartment(depId);
     });
 }
 
-function removeDepartment() {
+function removeDepartment(removeId) {
 
      // Update database
     let query = "DELETE FROM departments WHERE department_id = " + removeId;
+
     connection.query(query, function(err, res) {
         if (err) throw err;
-
-        let item = res[0];
         console.log("\n\n                    $ $ $ $ ".green + " Bamazon Supervisor | Department Removed ".white +  " $ $ $ $\n\n".green);
         supervisorPrompt();
     });
