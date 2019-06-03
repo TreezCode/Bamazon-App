@@ -23,7 +23,7 @@ CREATE TABLE departments (
     PRIMARY KEY (department_id)
 );
 
-ALTER TABLE products ADD product_sales DECIMAL(10,2) DEFAULT 0
+ALTER TABLE products ADD product_sales DECIMAL(10,2) DEFAULT 0;
 
 SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
                 IFNULL(SUM(products.product_sales), 0) AS total_sales,

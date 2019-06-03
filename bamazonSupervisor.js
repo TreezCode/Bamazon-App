@@ -16,6 +16,7 @@ const connection = mysql.createConnection({
 
 // Prompt user for purchase details
 function supervisorPrompt() {
+    
     inquirer.prompt([
         {
             type: "list",
@@ -172,5 +173,4 @@ function removeDepartment(removeId) {
         supervisorPrompt();
     });
 }
-
 supervisorPrompt();

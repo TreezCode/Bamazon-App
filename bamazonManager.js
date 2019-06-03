@@ -64,6 +64,7 @@ function displayProducts() {
         
     // Select all products from db
     let query = "SELECT * FROM products";
+    
     connection.query(query, function(err, res) {
         if (err) throw err;
         
@@ -104,6 +105,7 @@ function lowInventory() {
 
     // Select all products from db
     let query = "SELECT * FROM products";
+
     connection.query(query, function(err, res) {
         if (err) throw err;
 
@@ -170,6 +172,7 @@ function addPrompt() {
 function addInventory(addId, addQuantity) {
 
     let query = "SELECT * FROM products WHERE item_id = " + addId;
+
     connection.query(query, function(err, res) {
         if (err) throw err;
 
@@ -312,5 +315,4 @@ function removeProduct(removeId) {
         managerPrompt();
     });
 }
-
 managerPrompt();

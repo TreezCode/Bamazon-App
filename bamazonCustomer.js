@@ -5,9 +5,6 @@ const Table = require("cli-table3");
 const inquirer = require("inquirer");
 const colors = require("colors");
 
-// Global Variables
-let tilde = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~".rainbow;
-
 // Store connection with MySQL
 const connection = mysql.createConnection({
     host: "localhost",
@@ -58,6 +55,7 @@ function displayProducts () {
 
 // Prompt user for purchase details
 function promptBuyer() {
+    
     inquirer.prompt([
         {
             type: "input",
@@ -173,5 +171,4 @@ function repromptBuyer() {
     });
     
 }
-
 displayProducts();
