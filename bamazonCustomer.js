@@ -17,17 +17,13 @@ const connection = mysql.createConnection({
     database: "bamazon"
 });
 
-// Initialize connection
-connection.connect(function(err) {
-    if (err) throw err;
-    displayProducts();
-});
-
 // Display all items currently for sale
 function displayProducts () {
         
     // Select all products from db
-    connection.query("SELECT * FROM products", function(err, res) {
+    let query = "SELECT * FROM products"
+
+    connection.query(query, function(err, res) {
         if (err) throw err;
         
         // Create and style table constructor for "cli-table3"
@@ -88,16 +84,23 @@ function promptBuyer() {
 }
 
 function purchaseItem(purId, purQuantity) {
-    connection.query("SELECT * FROM products WHERE item_id = " + purId, function(err, res) {
-        if (err) throw err;
 
-        let item = res[0]; 
+    let query = "SELECT * FROM products WHERE item_id = " + purId;
+
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+      
+
+        let item = res[0];         
         
         // Check if current inventory count is high enough to fill order
-        if(purQuantity <= item.stock_quantity) {
+        if(purQuantity <= res[0].stock_quantity) {
 
             // Calculate and store total cost of purchase
             let cost = item.price * purQuantity;
+
+            // Calculate and store an updated product sales number
+            let productSales = item.product_sales + cost;
 
             // Create and style table constructor for "cli-table3"
             let table = new Table({
@@ -121,19 +124,28 @@ function purchaseItem(purId, purQuantity) {
                     {hAlign: "center", content: colors.green("$" + cost)}, 
                 ]
             );
-            console.log("\n\n                             $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
+            console.log("\n\n                                $ $ $ $ ".green + " Bamazon | Receipt ".white +  " $ $ $ $\n".green);
             console.log(table.toString() + "\n");
+            
+            // Update database stock quantity
+            let query1 = "UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId;
+            connection.query(query1);
 
-            // Update database with user input
-            connection.query("UPDATE products SET stock_quantity = stock_quantity - " + purQuantity + " WHERE item_id = " + purId);
+            // Update database product sales
+            let query2 = "UPDATE products SET ? WHERE ?";
+            connection.query(query2, 
+                [
+                    {
+                        product_sales: productSales + cost
+                    },
+                    {
+                        item_id: purId
+                    }
+                ]);
+              
             repromptBuyer();        
         } else {
-
-            console.log(
-                "\n" + tilde + "\n" +
-                "\n" + "Sorry it looks like we have insufficient stock for that order! >.<" + "\n" +
-                "\n" + tilde + "\n"
-            );
+            console.log("\n\n                              $ $ $ $ ".green + " Bamazon | ".white + "Insufficient Stock ".red +  " $ $ $ $\n".green);
             repromptBuyer();
         }
     });
@@ -151,19 +163,15 @@ function repromptBuyer() {
         }
     ])
     .then(answers => {
-
+        
         if (answers.reprompt === "Yes") {
             displayProducts();
         } else {
-            console.log(
-                "\n" + tilde + "\n" +
-                "\n" + "Thanks for shopping with Bamazon! >.<" + "\n" +
-                "\n" + tilde + "\n"
-            );
+            console.log("\n\n                         $ $ $ $ ".green + " Bamazon | ".white + "Thanks for Shopping With Us! ".rainbow +  " $ $ $ $\n".green);     
             connection.end();
         }
-
     });
     
 }
 
+displayProducts();
