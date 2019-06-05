@@ -207,7 +207,9 @@ function addInventory(addId, addQuantity) {
 
         // Update database with user input
         let query1 = "UPDATE products SET stock_quantity = stock_quantity + " + addQuantity + " WHERE item_id = " + addId;
-        connection.query(query1);
+        connection.query(query1, function(err, res) {
+            if (err) throw err;
+        });
         managerPrompt();
     })
 }

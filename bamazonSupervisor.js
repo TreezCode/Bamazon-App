@@ -73,10 +73,10 @@ function viewProductSales() {
                 {hAlign: "center", content: "Id:".grey},
                 {hAlign: "center", content: "Department Name:".grey}, 
                 {hAlign: "center", content: "Overhead Costs:".grey}, 
-                {hAlign: "center", content: "Total Sales".grey},
+                {hAlign: "center", content: "Total Sales:".grey},
                 {hAlign: "center", content: "Total Profit:".grey}            
             ],
-            colWidths: [10, 30, 20, 20, 20],
+            colWidths: [10, 25, 18, 18, 18],
         });
 
         // Iterate through response and push each item to the table with style     
@@ -86,9 +86,9 @@ function viewProductSales() {
                 [
                     {hAlign: "center", content: colors.white(res[i].department_id)}, 
                     {hAlign: "left", content: colors.yellow(res[i].department_name)}, 
-                    {hAlign: "center", content: colors.green(res[i].over_head_costs)}, 
-                    {hAlign: "center", content: colors.magenta(res[i].total_sales)},
-                    {hAlign: "center", content: colors.magenta(res[i].total_profit)}
+                    {hAlign: "center", content: colors.red(res[i].over_head_costs)}, 
+                    {hAlign: "center", content: colors.green(res[i].total_sales)},
+                    {hAlign: "center", content: colors.cyan(res[i].total_profit)}
                 ]
             );
         }
@@ -131,10 +131,14 @@ function addDepartment(name, cost) {
     // Update database
     let query = "INSERT INTO departments SET ? ";
 
-    connection.query(query, [{
-        department_name: name,
-        over_head_costs: cost,
-    }], function(err, res) {
+    connection.query(query, 
+        [
+            {
+                department_name: name,
+                over_head_costs: cost,
+            }
+        ],
+    function(err, res) {
         if (err) throw err;
         console.log("\n\n                        $ $ $ $ ".green + " Bamazon Supervisor | ".white + colors.yellow(name) +" Department Added ".white +  " $ $ $ $\n\n".green);
         supervisorPrompt();
