@@ -4,7 +4,6 @@
 ## About Bamzon
 Bamazon is an Amazon-like storefront application that stores data using hardcore MySQL skills. The app takes in orders from customers and depletes stock from the store's inventory. As a bonus, the app has been programmed to track product sales across the store's departments and then provides a summary of each departments gross sales in the store.
 
-
 <img src="images/intro-gif.gif" alt="Intro Gif" width="100%">
 
 ## How to Use 🤔
@@ -14,6 +13,7 @@ The user has 3 different javascript app file commands to choose from.
 `node bamazonCustomer.js`
 
 * Running this application first displays all of the items available for sale. Then the user is prompted with two messages:
+
     * What is the ID of the product they would like to purchase.
     * How many units of the product they would like to purchase.
 
@@ -22,10 +22,15 @@ The user has 3 different javascript app file commands to choose from.
 `node bamazonManager.js`
 
 * Running this application lists the following set of menu options for the user:
+
     * View Prodcuts for Sale
     * View Low Inventory
     * Add to Inventory
     * Add New Product
+
+* The user is able to view products with an inventory of less than 5.
+* The user is able to replenish the inventory of any chosen product.
+* The user is able to add/remove any new or existing product to/from the store.
 
 <img src="images/manager.png" alt="Manager View" width="75%">
 
@@ -37,7 +42,11 @@ The user has 3 different javascript app file commands to choose from.
   * Create New Department
   * Remove Department
 
-* This applications utilizes a seperate table in the database to store a *total sales* number for each department.
+* The user is able to view total product sales and total profit for entire departments
+
+* The user is able to add/remove any new or existing department to/from the store.
+
+* This applications utilizes a seperate table in the database to store the *total sales* number for each department.
 
   * There's a hard coded *overhead-costs* number added to each department
 
