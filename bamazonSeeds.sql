@@ -1,4 +1,9 @@
 
+-- @author: Joey Kubalak
+-- @github: TreezCode
+-- @comment: Week 12 Homework - Bamazon Node.js & MySQL
+
+
 INSERT INTO products (product_name, department_name, price, stock_quantity)
     VALUES  ("Fiya TV Cube w/ Balexa", "Electronics", 119.99, 25),
             ("Wise Cam 1080p HD Home Camera", "Electronics", 25.99, 50),

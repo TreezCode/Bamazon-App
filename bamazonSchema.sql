@@ -1,4 +1,9 @@
 
+-- @author: Joey Kubalak
+-- @github: TreezCode
+-- @comment: Week 12 Homework - Bamazon Node.js & MySQL
+
+
 DROP DATABASE IF EXISTS bamazon;
 
 CREATE DATABASE bamazon;

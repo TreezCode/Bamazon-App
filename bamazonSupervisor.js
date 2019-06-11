@@ -1,4 +1,9 @@
 
+// @author: Joey Kubalak
+// @github: TreezCode
+// @comment: Week 12 Homework - Bamazon Node.js & MySQL
+
+
 // Import packages
 const mysql = require("mysql");
 const Table = require("cli-table3");
