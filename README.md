@@ -58,7 +58,7 @@ The user has 3 different javascript app file commands to choose from.
 
 The user initialized the app by running the any of the 3 javascript files. 
 
-The **NPM Package** `inquirer` is called when the logic of the application is ran. This *prompts* the user for input, which is then stored and further used for various functions throughout the game.
+The **NPM Package** `inquirer` is called when the logic of the application is ran. This *prompts* the user for input, which is then stored and further used for various functions throughout the app.
 
 ``` 
 // Allow supervisor to create a brand new department in the database
