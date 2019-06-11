@@ -56,7 +56,7 @@ The user has 3 different javascript app file commands to choose from.
 
 ## How it Works 🔨 
 
-The user initialized the app by running the any of the 3 javascript files. 
+The user initializes the app by running the any of the 3 javascript files. 
 
 The **NPM Package** `inquirer` is called when the logic of the application is ran. This *prompts* the user for input, which is then stored and further used for various functions throughout the app.
 
