@@ -17,7 +17,7 @@ The user has 3 different javascript app file commands to choose from.
     * What is the ID of the product they would like to purchase.
     * How many units of the product they would like to purchase.
 
-<img src="images/customer.png" alt="Customer View" width="75%">
+<img src="images/customer.png" alt="Customer View" width="100%">
 
 `node bamazonManager.js`
 
@@ -32,7 +32,7 @@ The user has 3 different javascript app file commands to choose from.
 * The user is able to replenish the inventory of any chosen product.
 * The user is able to add/remove any new or existing product to/from the store.
 
-<img src="images/manager.png" alt="Manager View" width="75%">
+<img src="images/manager.png" alt="Manager View" width="100%">
 
 `node bamazonSupervisor.js`
 
@@ -52,7 +52,7 @@ The user has 3 different javascript app file commands to choose from.
 
   * A final column **Total Profit** is calculated on the fly by using the *overhead-costs* and the *total sales*
 
-<img src="images/supervisor.png" alt="Supervisor View" width="75%">
+<img src="images/supervisor.png" alt="Supervisor View" width="100%">
 
 ## How it Works 🔨 
 
